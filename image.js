@@ -1,43 +1,52 @@
-class ImageTextOverlay extends HTMLElement {
-    constructor() {
-        super();
-        this.attachShadow({ mode: 'open' });
-        this.shadowRoot.innerHTML = `
-            <style>
-                #image-container {
-                    position: relative;
-                    display: inline-block;
-                }
-                #image-container img {
-                    width: 100%;
-                    height: auto;
-                }
-                #overlay-text {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    color: white;
-                    font-size: 24px;
-                    font-weight: bold;
-                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-                    text-align: center;
-                }
-            </style>
-            <div id="image-container">
-                <img id="background-image" src="" alt="Background Image">
-                <div id="overlay-text"></div>
-            </div>
-        `;
-    }
+import { html, LitElement } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/all/lit-all.min.js';
 
-    connectedCallback() {
-        const imageUrl = this.getAttribute('image-url');
-        const text = this.getAttribute('overlay-text');
+// define the component
+export class ImageTextOverlayPlugIn extends LitElement {
+  
+  static properties = {
+    imageUrl: { type: String },
+    overlayText: { type: String }
+  };
+  
+  // return a promise for contract changes.
+  static getMetaConfig() {
+    return {
+      controlName: 'Image Text Overlay',
+      fallbackDisableSubmit: false,
+      groupName: 'Custom Plugins',
+      version: '1.0',
+      properties: {
+        imageUrl: {
+          type: 'string',
+          title: 'Image Source',
+          description: 'URL of the image to be used as the background'
+        },
+        overlayText: {
+          type: 'string',
+          title: 'Overlay Text',
+          description: 'Text to display in the middle of the image'
+        }
+      }
+    };
+  }
 
-        this.shadowRoot.getElementById('background-image').src = imageUrl;
-        this.shadowRoot.getElementById('overlay-text').innerText = text;
-    }
+  // function to render the overlay
+  renderOverlay() {
+    return html`
+      <div style="position: relative; display: inline-block;">
+        <img src="${this.imageUrl}" style="width: 100%; height: auto;" alt="Background Image">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); text-align: center;">
+          ${this.overlayText}
+        </div>
+      </div>
+    `;
+  }
+
+  render() {
+    return this.renderOverlay();
+  }
 }
 
-customElements.define('image-text-overlay', ImageTextOverlay);
+// registering the web component
+const elementName = 'image-text-overlay-plugin';
+customElements.define(elementName, ImageTextOverlayPlugIn);
